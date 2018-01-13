@@ -5,6 +5,9 @@ include("util.jl")
 include("ray_trace.jl")
 include("region_operators.jl")
 include("cell_utils.jl")
+include("distance_functions.jl")
+include("normal_functions.jl")
+include("logical_operators.jl")
 include("plotting.jl")
 
 export Coord
@@ -32,6 +35,9 @@ export dot
 export magnitude
 export unitize
 export cross
+export union, intersect, complement #should complement be a different symbol?
+export distance_field
+export normal_field
 
 using Plots
 

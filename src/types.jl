@@ -230,3 +230,12 @@ end
 
 _p = Coord(0,0,0)
 typeassert(_p, Coord)
+
+type ConstructedSurface <: Surface
+	#base_surfaces = Array{Surface}(2) #all operators are binary
+	distance_field::Function
+	normal_field::Function
+	function ConstructedSurface(distance_field, normal_field)
+		new(distance_field, normal_field)
+	end
+end

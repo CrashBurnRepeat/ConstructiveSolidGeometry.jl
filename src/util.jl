@@ -1,6 +1,7 @@
 import Base: +, -, *, ^, |, ~, dot, cross
 +(a::Coord, b::Coord)     = Coord(a.x+b.x, a.y+b.y, a.z+b.z)
 -(a::Coord, b::Coord)     = Coord(a.x-b.x, a.y-b.y, a.z-b.z)
+-(a::Coord)               = Coord(-a.x, -a.y, -a.z)
 *(a::Float64, b::Coord)   = Coord(a*b.x, a*b.y, a*b.z)
 *(b::Coord, a::Float64,)  = Coord(a*b.x, a*b.y, a*b.z)
 *(a::Int, b::Coord)       = Coord(a*b.x, a*b.y, a*b.z)
