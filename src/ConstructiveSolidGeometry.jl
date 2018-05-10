@@ -8,6 +8,7 @@ include("cell_utils.jl")
 include("distance_functions.jl")
 include("normal_functions.jl")
 include("logical_operators.jl")
+include("manipulation_operators.jl")
 include("plotting.jl")
 
 export Coord
@@ -21,7 +22,8 @@ export Box
 export Region
 export Cell
 export Geometry
-export +,-,*,^,|,~
+export ConstructedSurface
+export +,-,*,^,|,~,==,zero
 export reflect
 export generate_random_ray
 export raytrace
@@ -38,7 +40,11 @@ export cross
 export union, intersect, complement #should complement be a different symbol?
 export distance_field
 export normal_field
+export rotate, rotate!, translate
+export x̂, ŷ, ẑ
 
-using Plots
+using Plots: heatmap, ColorGradient, RGBA
+using StaticArrays: SVector, SArray
+using ForwardDiff
 
 end # module

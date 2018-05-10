@@ -7,9 +7,9 @@ An {x,y,z} coordinate type. Used throughout the ConstructiveSolidGeometry.jl pac
 * `Coord(x::Float64, y::Float64, z::Float64)`
 """
 type Coord
-    x::Float64
-    y::Float64
-    z::Float64
+    x
+    y
+    z
 end
 
 """
@@ -21,8 +21,8 @@ A ray is defined by its origin and a unitized direction vector
 * `Ray(origin::Coord, direction::Coord)`
 """
 type Ray
-    origin::Coord
-    direction::Coord
+    origin
+    direction
 end
 
 """
@@ -47,12 +47,12 @@ Defined by a point on the surface of the plane, its unit normal vector, and an o
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are "transmission" (default), "vacuum", and "reflective".
 """
 type Plane <: Surface
-    point::Coord
-    normal::Coord
+    point
+    normal
     reflective::Bool
 	vacuum::Bool
-	Plane(point::Coord, normal::Coord, ref::Bool, vac::Bool) = new(point, normal, ref, vac)
-	function Plane(point::Coord, normal::Coord, boundary::String)
+	Plane(point, normal, ref::Bool, vac::Bool) = new(point, normal, ref, vac)
+	function Plane(point, normal, boundary::String)
 		if boundary == "reflective"
 			new(point, normal, true, false)
 		elseif boundary == "vacuum"
@@ -61,7 +61,7 @@ type Plane <: Surface
 			new(point, normal, false, false)
 		end
 	end
-	Plane(point::Coord, normal::Coord) = new(point, normal, false, false)
+	Plane(point, normal) = new(point, normal, false, false)
 end
 
 """
@@ -80,8 +80,8 @@ Defined by the tip of the cone, its direction axis vector, the angle between the
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
 type Cone <: Surface
-    tip::Coord
-    axis::Coord
+    tip
+    axis
 	theta::Float64
     reflective::Bool
 	vacuum::Bool
@@ -113,21 +113,27 @@ Defined by the center of the sphere, its radius, and an optional boundary condit
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
 type Sphere <: Surface
-    center::Coord
+    center
     radius::Float64
     reflective::Bool
 	vacuum::Bool
-	Sphere(c::Coord, r::Float64, ref::Bool, vac::Bool) = new(c, r, ref, vac)
-	function Sphere(c::Coord, r::Float64, boundary::String)
+	distance_field::Function
+	normal_field::Function
+	function Sphere(c, r::Float64, ref::Bool, vac::Bool)
+		dist = x->sqrt((x-c)⋅(x-c))-r
+		norm = x->ForwardDiff.gradient(dist,x)
+		new(c, r, ref, vac, dist, norm)
+	end
+	function Sphere(c, r::Float64, boundary::String)
 		if boundary == "reflective"
-			new(c, r, true, false)
+			Sphere(c, r, true, false)
 		elseif boundary == "vacuum"
-			new(c, r, false, true)
+			Sphere(c, r, false, true)
 		else
-			new(c, r, false, false)
+			Sphere(c,r,false, false)
 		end
 	end
-	Sphere(c::Coord, r::Float64) = new(c, r, false, false)
+	Sphere(c, r::Float64) = Sphere(c,r,false,false)
 end
 
 """
@@ -146,13 +152,13 @@ An arbitrary direction infinite cylinder defined by any point on its central axi
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
 type InfCylinder <: Surface
-    center::Coord
-    normal::Coord
+    center
+    normal
     radius::Float64
     reflective::Bool
 	vacuum::Bool
-	InfCylinder(c::Coord, n::Coord, r::Float64, ref::Bool, vac::Bool) = new(c, n, r, ref, vac)
-	function InfCylinder(c::Coord, n::Coord, r::Float64, boundary::String)
+	InfCylinder(c, n, r::Float64, ref::Bool, vac::Bool) = new(c, n, r, ref, vac)
+	function InfCylinder(c, n, r::Float64, boundary::String)
 		if boundary == "reflective"
 			new(c, n, r, true, false)
 		elseif boundary == "vacuum"
@@ -161,7 +167,7 @@ type InfCylinder <: Surface
 			new(c, n, r, false, false)
 		end
 	end
-	InfCylinder(c::Coord, n::Coord, r::Float64) = new(c, n, r, false, false)
+	InfCylinder(c, n, r::Float64) = new(c, n, r, false, false)
 end
 
 """
@@ -173,8 +179,8 @@ An axis aligned box is defined by the minimum `Coord` and maximum `Coord` of the
 * `Box(min::Coord, max::Coord)`
 """
 type Box
-    lower_left::Coord
-    upper_right::Coord
+    lower_left
+    upper_right
 end
 
 """
@@ -237,5 +243,8 @@ type ConstructedSurface <: Surface
 	normal_field::Function
 	function ConstructedSurface(distance_field, normal_field)
 		new(distance_field, normal_field)
+	end
+	function ConstructedSurface(distance_field)
+		new(distance_field, x->ForwardDiff.gradient(distance_field,x))
 	end
 end
