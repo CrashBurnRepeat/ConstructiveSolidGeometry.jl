@@ -5,11 +5,18 @@ import Base: union, intersect, -
 function union(x::T, y::S) where {T<:Surface, S<:Surface}
     x_dist_fun = (c)->distance_field(x,c)
     y_dist_fun = (c)->distance_field(y,c)
-    dist_fun = (c)->
-        if x_dist_fun(c)==y_dist_fun(c)
-            (x_dist_fun(c)+y_dist_fun(c))/2.0 #properly defines the normal for ForwardDiff
+    dist_fun = (c)->min(x_dist_fun(c),y_dist_fun(c))
+    norm_fun = (c)->
+        if x_dist_fun == y_dist_fun
+            x_norm_func = (x)->ForwardDiff.gradient(x_dist_fun,x)
+            y_norm_func = (y)->ForwardDiff.gradient(y_dist_fun,y)
+            if (x_norm_func(c)==y_norm_func(c)) #protects against self-union
+                x_norm_func(c)
+            else
+                [NaN, NaN] #the proper gradient here is undefined
+            end
         else
-            min(x_dist_fun(c),y_dist_fun(c))
+            ForwardDiff.gradient(dist_fun,c)
         end
     return ConstructedSurface(dist_fun)
 end
@@ -17,13 +24,20 @@ end
 function intersect(x::T, y::S) where {T<:Surface, S<:Surface}
     x_dist_fun = (c)->distance_field(x,c)
     y_dist_fun = (c)->distance_field(y,c)
-    dist_fun = (c)->
-        if x_dist_fun(c)==y_dist_fun(c)
-            (x_dist_fun(c)+y_dist_fun(c))/2.0 #properly defines the normal for ForwardDiff
+    dist_fun = (c)->max(x_dist_fun(c),y_dist_fun(c))
+    norm_fun = (c)->
+    if x_dist_fun == y_dist_fun
+        x_norm_func = (x)->ForwardDiff.gradient(x_dist_fun,x)
+        y_norm_func = (y)->ForwardDiff.gradient(y_dist_fun,y)
+        if (x_norm_func(c)==y_norm_func(c)) #protects against self-union
+            x_norm_func(c)
         else
-            max(x_dist_fun(c),y_dist_fun(c))
+            [NaN, NaN] #the proper gradient here is undefined
         end
-    return ConstructedSurface(dist_fun)
+    else
+        ForwardDiff.gradient(dist_fun,c)
+    end
+    return ConstructedSurface(dist_fun, norm_fun)
 end
 
 function -(x::T, y::S) where {T<:Surface, S<:Surface}
