@@ -13,7 +13,7 @@ function union(x::T, y::S) where {T<:Surface, S<:Surface}
             if (x_norm_func(c)==y_norm_func(c)) #protects against self-union
                 x_norm_func(c)
             else
-                [NaN, NaN] #the proper gradient here is undefined
+                zeros(size(c))*NaN #the proper gradient here is undefined
             end
         else
             ForwardDiff.gradient(dist_fun,c)
@@ -32,7 +32,7 @@ function intersect(x::T, y::S) where {T<:Surface, S<:Surface}
         if (x_norm_func(c)==y_norm_func(c)) #protects against self-union
             x_norm_func(c)
         else
-            [NaN, NaN] #the proper gradient here is undefined
+            zeros(size(c))*NaN #the proper gradient here is undefined
         end
     else
         ForwardDiff.gradient(dist_fun,c)
