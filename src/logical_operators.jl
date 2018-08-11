@@ -18,7 +18,7 @@ function union(x::T, y::S) where {T<:Surface, S<:Surface}
         else
             ForwardDiff.gradient(dist_fun,c)
         end
-    return ConstructedSurface(dist_fun)
+    return ConstructedSurface(dist_fun, norm_fun)
 end
 
 function intersect(x::T, y::S) where {T<:Surface, S<:Surface}

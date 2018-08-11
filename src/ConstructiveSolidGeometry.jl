@@ -46,5 +46,6 @@ export x̂, ŷ, ẑ
 using Plots: heatmap, ColorGradient, RGBA
 using StaticArrays: SVector, SArray
 using ForwardDiff
+using LinearAlgebra
 
 end # module

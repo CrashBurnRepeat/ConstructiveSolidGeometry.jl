@@ -1,4 +1,5 @@
-import Base: +, -, *, ^, |, ~, dot, cross, ==, zero
+import Base: +, -, *, ^, |, ~, ==, zero
+import LinearAlgebra: dot, cross
 +(a::Coord, b::Coord)     = Coord(a.x+b.x, a.y+b.y, a.z+b.z)
 -(a::Coord, b::Coord)     = Coord(a.x-b.x, a.y-b.y, a.z-b.z)
 -(a::Coord)               = Coord(-a.x, -a.y, -a.z)

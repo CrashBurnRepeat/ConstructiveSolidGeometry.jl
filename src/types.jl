@@ -6,7 +6,7 @@ An {x,y,z} coordinate type. Used throughout the ConstructiveSolidGeometry.jl pac
 # Constructors
 * `Coord(x::Float64, y::Float64, z::Float64)`
 """
-type Coord
+mutable struct Coord
     x
     y
     z
@@ -20,7 +20,7 @@ A ray is defined by its origin and a unitized direction vector
 # Constructors
 * `Ray(origin::Coord, direction::Coord)`
 """
-type Ray
+mutable struct Ray
     origin
     direction
 end
@@ -46,7 +46,7 @@ Defined by a point on the surface of the plane, its unit normal vector, and an o
 * `normal::Coord`: A unit normal vector of the plane. Recommended to use `unitize(c::Coord)` if normalizing is needed.
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are "transmission" (default), "vacuum", and "reflective".
 """
-type Plane <: Surface
+struct Plane <: Surface
     point
     normal
     reflective::Bool
@@ -79,7 +79,7 @@ Defined by the tip of the cone, its direction axis vector, the angle between the
 * `theta::Float64`: The angle (in radians) between the central axis (must be between 0 and pi/2)
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
-type Cone <: Surface
+struct Cone <: Surface
     tip
     axis
 	theta::Float64
@@ -112,7 +112,7 @@ Defined by the center of the sphere, its radius, and an optional boundary condit
 * `radius::Float64`: The radius of the sphere
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
-type Sphere <: Surface
+struct Sphere <: Surface
     center
     radius::Float64
     reflective::Bool
@@ -151,7 +151,7 @@ An arbitrary direction infinite cylinder defined by any point on its central axi
 * `radius::Float64`: The radius of the infinite cylinder
 * `boundary::String`: Optional boundary condition, defined as a `String`. Options are \"transmission\" (default) or \"vacuum\".
 """
-type InfCylinder <: Surface
+struct InfCylinder <: Surface
     center
     normal
     radius::Float64
@@ -178,7 +178,7 @@ An axis aligned box is defined by the minimum `Coord` and maximum `Coord` of the
 # Constructors
 * `Box(min::Coord, max::Coord)`
 """
-type Box
+mutable struct Box
     lower_left
     upper_right
 end
@@ -195,7 +195,7 @@ The volume that is defined by a surface and one of its halfspaces
 * `surface::Surface`: A `Sphere`, `Plane`, or `InfCylinder`
 * `halfspace::Int64`: Either +1 or -1
 """
-type Region
+mutable struct Region
     surface::Surface
     halfspace::Int64
 end
@@ -212,7 +212,7 @@ Defined by an array of regions and the logical combination of those regions that
 * `regions::Array{Region}`: An array of regions that are used to define the cell
 * `definition::Expr`: A logical expression that defines the volume of the cell. The intersection operator is ^, the union operator is |, and the complement operator is ~. Regions are defined by their integer indices in the regions array.
 """
-type Cell
+mutable struct Cell
     regions::Array{Region}
     definition::Expr
 end
@@ -229,7 +229,7 @@ The top level object that holds all the cells in the problem. This object contai
 * `cells::Array{Cell}`: All cells inside the geometry. The cells must combine to fill the entire space of the bounding box. No two cells should overlap.
 * `bounding_box::Box`: The bounding box around the problem.
 """
-type Geometry
+mutable struct Geometry
     cells::Array{Cell}
     bounding_box::Box
 end
@@ -237,7 +237,7 @@ end
 _p = Coord(0,0,0)
 typeassert(_p, Coord)
 
-type ConstructedSurface <: Surface
+struct ConstructedSurface <: Surface
 	#base_surfaces = Array{Surface}(2) #all operators are binary
 	distance_field::Function
 	normal_field::Function
